@@ -4,30 +4,37 @@ from settings import settings
 from kafka.consumer import group
 from psycopg2.extras import RealDictCursor
 import psycopg2
+from logger_common import get_logger
+import traceback
+import sys
 
 class Database:
-    def __init__(self):
+    def __init__(self,logger,conf):
         """ Connect to the PostgreSQL database server """
         self.db_conn = None
         self.cur = None
-        conf = settings()
+        self.logger = logger
         try:
             # connect to the PostgreSQL server
-            print('Connecting to the PostgreSQL database...')
+            
+            
+            logger.info('Connecting to the PostgreSQL database via uri : {0}'.format(conf.database_uri))
             database_uri = conf.database_uri
+            
             self.db_conn = psycopg2.connect(database_uri)
             
-            # create a cursor
+            logger.info("Creating cursor")
             self.cur = self.db_conn.cursor()
             
-            # execute a statement
-            print('PostgreSQL database version:')
+            
+
+            logger.info('PostgreSQL database version:')
             self.cur.execute('SELECT version()')
 
             # display the PostgreSQL database server version
             db_version = self.cur.fetchone()
-            print(db_version)
 
+            logger.info(db_version)
 
             # create table if doesn't exist
             self.cur.execute('CREATE TABLE IF NOT EXISTS website_checker ('
@@ -40,7 +47,8 @@ class Database:
 
 
         except (Exception, psycopg2.DatabaseError) as error: ## log error and exit
-            print(error)
+            logger.fatal(error)
+            sys.exit(error)
 
 
     def close_connection(self):
@@ -49,7 +57,7 @@ class Database:
             self.cur.close()
         if self.db_conn is not None:
             self.db_conn.close()
-        print('Database connection closed.')
+        logger.info('Database connection closed.')
 
     def print_all_content(self):
         self.cur.execute("SELECT * from website_checker")
@@ -68,14 +76,26 @@ class Database:
 
 
 if __name__ == "__main__":
-    conf = settings()
-    consumer = KafkaConsumer(
+    logger = get_logger( 'database_storing_consumer.log')
+    conf = settings(logger)
+    
+    try:
+        consumer = KafkaConsumer(
         conf.website_checker_topic,
         bootstrap_servers=conf.bootstrap_server,
         auto_offset_reset = 'earliest',
-        group_id=conf.consumer_group_id
-    )
-    database = Database()
+        group_id=conf.consumer_group_id)
+    except Exception as e:
+        msg = traceback.format_exc()
+        logger.error(traceback.format_exc())
+        sys.exit(msg)
+
+
+    logger.info('KafkaConsumer successfully initialized')
+    logger.info("website_checker_topic is {0}".format(conf.website_checker_topic))
+    
+    
+    database = Database(logger,conf)
 
     database.cur.execute('SELECT table_name FROM information_schema.tables WHERE table_schema=\'public\'')
     print(database.cur.fetchall())
@@ -88,12 +108,12 @@ if __name__ == "__main__":
 
  
 
-    print("starting the consumer")
+    logger.info("starting the consumer")
     for msg in consumer:
-        print("data received = {}".format(json.loads(msg.value)))
+        logger.debug("data received = {}".format(json.loads(msg.value)))
         rec = json.loads(msg.value)
         database.cur.execute("INSERT INTO website_checker (CHECK_TIME_EPOCH,STATUS_CODE,RESPONSE_TIME_SECONDS,TEST_PATTERN_FOUND) VALUES (%s, %s, %s, %s)", \
             (rec['check_time_epoch'],rec['status_code'],rec['response_time_seconds'],rec['test_pattern_found'],));
-        database.print_all_content()
+        #database.print_all_content()
 
     database.close_connection()
