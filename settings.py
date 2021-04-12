@@ -18,7 +18,7 @@ class settings:
 
         required_components_dict = {
             'KafkaServerOptions' : ["BootstrapServer","Topic"],
-            'WebsiteCheckerProducer' : ["TargetWebsite","DeltaTimeCheckSeconds", "PatternToMatch"],
+            'WebsiteCheckerProducer' : ["TargetWebsites","DeltaTimesCheckSeconds", "PatternsToMatch"],
             'DatabaseStorerConsumer' : ["GroupId","DataBaseUri"],
         }
 
@@ -40,10 +40,10 @@ class settings:
 
         self.bootstrap_server = settings_file.get("KafkaServerOptions","BootstrapServer")
         self.website_checker_topic = settings_file.get("KafkaServerOptions","Topic")
-        self.target_website = settings_file.get("WebsiteCheckerProducer","TargetWebsite")
-        self.delta_time_availability_check_sec = settings_file.getint("WebsiteCheckerProducer","DeltaTimeCheckSeconds")
+        self.target_websites = settings_file.get("WebsiteCheckerProducer","TargetWebsites").split(',')
+        self.delta_times_availability_check_sec = [int(i) for i in settings_file.get("WebsiteCheckerProducer","DeltaTimesCheckSeconds").split(',')]
         self.database_uri = settings_file.get("DatabaseStorerConsumer","DataBaseUri")
-        self.pattern_expected_to_be_found = settings_file.get("WebsiteCheckerProducer","PatternToMatch")
+        self.patterns_expected_to_be_found = settings_file.get("WebsiteCheckerProducer","PatternsToMatch").split(',')
         self.consumer_group_id = settings_file.get("DatabaseStorerConsumer","GroupId")
 
         msg = '{0} configuration file successfull load'.format(filename)

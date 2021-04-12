@@ -26,11 +26,12 @@ class database_handler:
             database_uri = self.conf.database_uri
             
             self.db_conn = psycopg2.connect(database_uri)
+            self.db_conn.autocommit = True
             
             self.logger.info("Creating cursor")
             self.cur = self.db_conn.cursor()
             
-            
+
 
             self.logger.info('PostgreSQL database version:')
             self.cursor.execute('SELECT version()')
@@ -41,12 +42,16 @@ class database_handler:
             self.logger.info(db_version)
 
             # create table if doesn't exist
+            
             self.cursor.execute('CREATE TABLE IF NOT EXISTS website_checker ('
                                 '  LOG_ID SERIAL PRIMARY KEY,  '
+                                '  WEBSITE_URL VARCHAR(512) not null, '
                                 '  CHECK_TIME_EPOCH INT not null,'
                                 '  STATUS_CODE INT not null,'
                                 '  RESPONSE_TIME_SECONDS FLOAT not null,'
                                 '  TEST_PATTERN_FOUND INT not null)')
+
+            self.print_all_content()
 
 
 
@@ -71,17 +76,19 @@ class database_handler:
         rows = self.cursor.fetchall()
         for row in rows:
             print("log_id =", row[0])
-            print("check_time_epoch =", row[1])
-            print("status_code =", row[2])
-            print("response_time_seconds =", row[3])
-            print("test_pattern_found =", row[4], "\n")
+            print('website_url', row[1])
+            print("check_time_epoch =", row[2])
+            print("status_code =", row[3])
+            print("response_time_seconds =", row[4])
+            print("test_pattern_found =", row[5], "\n")
 
     def print_latest_record(self):
         self.cursor.execute("SELECT * FROM website_checker ORDER BY LOG_ID DESC LIMIT 1")
         rows = self.cursor.fetchall()
         for row in rows:
             print("log_id =", row[0])
-            print("check_time_epoch =", row[1])
-            print("status_code =", row[2])
-            print("response_time_seconds =", row[3])
-            print("test_pattern_found =", row[4], "\n")
+            print('website_url', row[1])
+            print("check_time_epoch =", row[2])
+            print("status_code =", row[3])
+            print("response_time_seconds =", row[4])
+            print("test_pattern_found =", row[5], "\n")

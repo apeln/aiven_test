@@ -50,8 +50,8 @@ if __name__ == "__main__":
     for msg in consumer:
         logger.debug("data received = {}".format(json.loads(msg.value)))
         rec = json.loads(msg.value)
-        query = "INSERT INTO website_checker (CHECK_TIME_EPOCH,STATUS_CODE,RESPONSE_TIME_SECONDS,TEST_PATTERN_FOUND) VALUES ({0}, {1}, {2}, {3})".format( \
-            rec['check_time_epoch'],rec['status_code'],rec['response_time_seconds'],rec['test_pattern_found'])
+        query = "INSERT INTO website_checker (WEBSITE_URL, CHECK_TIME_EPOCH,STATUS_CODE,RESPONSE_TIME_SECONDS,TEST_PATTERN_FOUND) VALUES ('{0}', {1}, {2}, {3}, {4})".format( \
+            rec['website_address'], rec['check_time_epoch'],rec['status_code'],rec['response_time_seconds'],rec['test_pattern_found'])
         database.execute_sql_query(query);
         database.print_latest_record()
 
