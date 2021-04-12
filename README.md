@@ -38,7 +38,15 @@ Running
     python3 database_storing_consumer.py
     ```
     *database_storing_consumer.log* file will be created containing the log messages. </br> 
-    This code connects to PostgreSQL database (address and authentication information is defined in settings.ini), creates relevant database table and creates Kafka consumer that stores the received data to the database.
+    This code connects to PostgreSQL database (address and authentication information is defined in settings.ini), creates relevant database table and creates Kafka consumer that stores the received data to the database. </br> 
+    Table **website_checker** will be created (if doesn't exist) in the target database. </br>
+    The format as follows: </br>
+    | column name | log_id | website_url | check_time_epoch | status_code | response_time_seconds | test_pattern_found |
+    | :---: | :---: | :---: | :---: | :---: | :---: | :---: | 
+    | column info  | running id | target website | check timestamp - epoch time | return code | HTTP response time | is test pattern found on the page | 
+
+    
+
 
 
 <br />
