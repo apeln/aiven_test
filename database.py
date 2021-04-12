@@ -75,3 +75,13 @@ class database_handler:
             print("status_code =", row[2])
             print("response_time_seconds =", row[3])
             print("test_pattern_found =", row[4], "\n")
+
+    def print_latest_record(self):
+        self.cursor.execute("SELECT * FROM website_checker ORDER BY LOG_ID DESC LIMIT 1")
+        rows = self.cursor.fetchall()
+        for row in rows:
+            print("log_id =", row[0])
+            print("check_time_epoch =", row[1])
+            print("status_code =", row[2])
+            print("response_time_seconds =", row[3])
+            print("test_pattern_found =", row[4], "\n")
