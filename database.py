@@ -10,9 +10,11 @@ class database_handler:
         self.cur = None
         self.logger = logger
         self.conf = conf
-        self.connect()
+        #self.connect()
         
-
+    @property
+    def cursor(self):
+        return self.cur
     
     def connect(self):
         """ Connect to the PostgreSQL database server """
@@ -31,15 +33,15 @@ class database_handler:
             
 
             self.logger.info('PostgreSQL database version:')
-            self.cur.execute('SELECT version()')
+            self.cursor.execute('SELECT version()')
 
             # display the PostgreSQL database server version
-            db_version = self.cur.fetchone()
+            db_version = self.cursor.fetchone()
 
             self.logger.info(db_version)
 
             # create table if doesn't exist
-            self.cur.execute('CREATE TABLE IF NOT EXISTS website_checker ('
+            self.cursor.execute('CREATE TABLE IF NOT EXISTS website_checker ('
                                 '  LOG_ID SERIAL PRIMARY KEY,  '
                                 '  CHECK_TIME_EPOCH INT not null,'
                                 '  STATUS_CODE INT not null,'
@@ -53,19 +55,20 @@ class database_handler:
             sys.exit(error)
 
     def execute_sql_query(self,sql_query):
-        self.cur.execute(sql_query)
+        #self.cur.execute(sql_query)
+        self.cursor.execute(sql_query)
 
     def close_connection(self):
         # close the communication with the PostgreSQL
-        if self.cur is not None:
-            self.cur.close()
+        if self.cursor is not None:
+            self.cursor.close()
         if self.db_conn is not None:
             self.db_conn.close()
         self.logger.info('Database connection closed.')
 
     def print_all_content(self):
-        self.cur.execute("SELECT * from website_checker")
-        rows = self.cur.fetchall()
+        self.cursor.execute("SELECT * from website_checker")
+        rows = self.cursor.fetchall()
         for row in rows:
             print("log_id =", row[0])
             print("check_time_epoch =", row[1])

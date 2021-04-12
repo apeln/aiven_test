@@ -41,7 +41,8 @@ Running
     This code connects to PostgreSQL database (address and authentication information is defined in settings.ini), creates relevant database table and creates Kafka consumer that stores the received data to the database.
 
 
-
+<br />
+<br />
 Appendix
 ------------
 ------------
