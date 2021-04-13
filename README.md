@@ -20,7 +20,7 @@ pip3 install psycopg2-binary
 
 Important Note
 --------------------------
-In my testing I used only **one** Broker. For efficient operation I would split the data of a topic across multiple brokers 
+In my testing I used only **one** Kafka Broker. For efficient operation I would split the data of a topic across multiple brokers 
 to balance the load between them. And then we will acheive parallelism by assigning each partition to **different** consumer group .
 
 Configuration
@@ -30,8 +30,58 @@ Configuration
     vim settings.ini
     ```
     This file will be used by the both scripts (website_checker_producer.py and database_storing_consumer.py)
+    ### File legend
 
-2. For efficient operation create topic (as specified in settings.ini - Topic: website_availability) BEFORE running the **website_checker_producer** and set number of partitions to the # of target websites  (as specified in settings.ini - TargetWebsites: https://aiven.io/,https://stackoverflow.com/ - in this case **2**)
+    <table>
+        <thead>
+        <tr>
+            <th>Parameter Name</th>
+            <th>Legend</th>
+            <th>Example</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>BootstrapServer</td>
+                <td>Bootstraper server address:port</td>
+                <td><code>BootstrapServer: 10.100.102.157:9092</code></td>
+            </tr>
+            <tr>
+                <td>Topic</td>
+                <td>Topic Kafka producer will send to and Kafka consumer will subscribe to</td>
+                <td><code>website_availability</code></td>
+            </tr>
+            <tr>
+                <td>TargetWebsites</td>
+                <td>Websites to monitor. Must be separated by comma</td>
+                <td><code>TargetWebsites: https://aiven.io/,https://stackoverflow.com/</code></td>
+            </tr>
+            <tr>
+                <td>DeltaTimesCheckSeconds</td>
+                <td>Delta time in seconds to monitor each of websites listed in TargetWebsites. Must be a list the same length as TargetWebsites and separated by comma</td>
+                <td><code>DeltaTimesCheckSeconds: 4,10</code></td>
+            </tr>
+            <tr>
+                <td>PatternsToMatch</td>
+                <td>Patterns to check in each received webpage of websites listed in TargetWebsites. Must be a list the same length as TargetWebsites and separated by comma</td>
+                <td><code>PatternsToMatch: Aiven for IoT,Software engineers</code></td>
+            </tr>
+            <tr>
+                <td>GroupId</td>
+                <td>Name of the consumer group a Kafka consumer belongs to</td>
+                <td><code>GroupId: website-checker-id</code></td>
+            </tr>
+            <tr>
+                <td>DataBaseUri</td>
+                <td>Database uri to connect to PostgreSQL database</td>
+                <td><code>DataBaseUri: postgres://avnadmin:g6okjiuj3xzzlayj@pg-1ae5a0ff-alexander-1112.aivencloud.com:17527/defaultdb?sslmode=require</code></td>
+            </tr>
+        </tbody>
+    </table>
+    </br>
+    </br>
+
+2. For an efficient operation create topic (as specified in settings.ini - Topic: website_availability) BEFORE running the **website_checker_producer** and set number of partitions to the # of target websites  (as specified in settings.ini - TargetWebsites: https://aiven.io/,https://stackoverflow.com/ - in this case **2**)
 
 Running
 --------------------------
