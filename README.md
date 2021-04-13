@@ -109,8 +109,11 @@ Running
     **Note** </br>
     For efficient operation run #database_storing_consumer instances equals to the # of target websites (as specified in settings.ini).</br>
              And for even more efficient operation assign each partition to different consumer group (consumer group in specified in settings.ini - GroupId: website-checker-id)
-
-    
+</br>
+3. Basic unit test implemented for checking the database_handler. Run:
+    ```
+    python3 unit_test_database_handler.py 
+    ```
 
 
 
