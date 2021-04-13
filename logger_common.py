@@ -17,7 +17,6 @@ def get_logger(log_file_name):
     # add file handler to logger
     logger.addHandler(file_handler)
 
-
     consoleHandler = logging.StreamHandler()
     consoleHandler.setFormatter(formatter)
     logger.addHandler(consoleHandler)
